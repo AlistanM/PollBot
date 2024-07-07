@@ -1,12 +1,11 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using PollBot.Bot;
+using PollBot.Configuration;
 using PollBot.Data;
 using PollBot.Jobs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
 using Telegram.Bot;
 
 namespace PollBot
@@ -22,13 +21,15 @@ namespace PollBot
             services.AddBot();
             services.AddJobs();
             services.AddServices();
+            services.AddConfiguration();
 
             return services.BuildServiceProvider();
         }
 
         private static void AddBot(this IServiceCollection services)
         {
-            services.AddTransient<ITelegramBotClient>(x => new TelegramBotClient("###"));
+            services.AddTransient<ITelegramBotClient>(provider => 
+                new TelegramBotClient(provider.GetService<AppSettings>().TelegramToken));
         }
 
         private static void AddJobs(this IServiceCollection services)
@@ -39,7 +40,23 @@ namespace PollBot
 
         private static void AddServices(this IServiceCollection services)
         {
-            services.AddTransient<CommandHandler>();   
+            services.AddTransient<CommandHandler>();
+        }
+
+        private static void AddConfiguration(this IServiceCollection services)
+        {
+            IConfiguration config = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", false)
+                .AddUserSecrets(Assembly.GetExecutingAssembly())
+                .Build();
+
+            services.AddSingleton(config);
+            services.AddSingleton(provider => 
+                provider
+                    .GetService<IConfiguration>()
+                    .GetRequiredSection("AppSettings")
+                    .Get<AppSettings>());
         }
     }
 }

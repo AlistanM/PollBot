@@ -1,9 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using PollBot.Bot;
+using PollBot.Configuration;
 using PollBot.Data;
-using System.Dynamic;
-using System.Security.Cryptography.X509Certificates;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 
@@ -11,7 +10,6 @@ namespace PollBot
 {
     class Program
     {
-        static public ITelegramBotClient bot = new TelegramBotClient("###");
         static public long BotId { get; private set; }
 
         static async Task Main(string[] args)
@@ -26,6 +24,8 @@ namespace PollBot
             {
                 AllowedUpdates = { },
             };
+
+            var bot = provider.GetService<ITelegramBotClient>();
             bot.StartReceiving(
                 provider.GetService<CommandHandler>(),
                 receiverOptions,
