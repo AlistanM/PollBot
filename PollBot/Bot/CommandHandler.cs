@@ -30,7 +30,6 @@ namespace PollBot.Bot
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            
             if (update.Message?.NewChatMembers?.Select(x => x.Id).Contains(Program.BotId) ?? false)
             {
                 var id = await _db.ChatPolls.FirstOrDefaultAsync(x => x.ChatId == update.Message.Chat.Id);
