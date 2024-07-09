@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using PollBot.Services;
 using PollBot.Data;
 using PollBot.Data.Models;
 using System;
@@ -10,6 +11,8 @@ using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.ReplyMarkups;
+using static System.Collections.Specialized.BitVector32;
 
 namespace PollBot.Bot
 {
@@ -30,15 +33,16 @@ namespace PollBot.Bot
 
         public async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
+
             if (update.Message?.NewChatMembers?.Select(x => x.Id).Contains(Program.BotId) ?? false)
             {
                 var id = await _db.ChatPolls.FirstOrDefaultAsync(x => x.ChatId == update.Message.Chat.Id);
                 if(id != null) 
                 {
                     _db.ChatPolls.Remove(id);
-                    await _db.SaveChangesAsync();
+                    await _db.SaveChangesAsync(); 
                 }
-                var newChat = new ChatPoll() { ChatId =  update.Message.Chat.Id};
+                var newChat = new ChatPoll() { ChatId =  update.Message.Chat.Id, ChatTitle = update.Message.Chat.Title};
                 _db.Add(newChat);
                 await _db.SaveChangesAsync();
             }

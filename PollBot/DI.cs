@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using PollBot.Services;
 using PollBot.Bot;
 using PollBot.Configuration;
 using PollBot.Data;
@@ -36,11 +37,15 @@ namespace PollBot
         {
             services.AddTransient<PollCreateJob>();
             services.AddTransient<CompletePoll>();
+            services.AddTransient<ConsoleHandleJob>();
         }
 
         private static void AddServices(this IServiceCollection services)
         {
+            services.AddTransient<ConsoleParserService>();
+            services.AddTransient<AdminService>();
             services.AddTransient<CommandHandler>();
+            services.AddSingleton<DictGeneratorService>();
         }
 
         private static void AddConfiguration(this IServiceCollection services)

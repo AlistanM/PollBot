@@ -43,14 +43,12 @@ namespace PollBot.Jobs
 
                                 await _botClient.SendTextMessageAsync(chat.ChatId, $"Сбор гусей в {match} мск");
                                 break;
-                            }
+                            }     
+                        }
 
-                            else
-                            {
-                                await _botClient.SendTextMessageAsync(chat.ChatId, $"Сегодня гусей не собираем");
-                                break;
-                            }
-                            
+                        if(voterCount < 6)
+                        {
+                            await _botClient.SendTextMessageAsync(chat.ChatId, $"Сегодня гусей не собираем");
                         }
                     }
                 }

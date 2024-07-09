@@ -34,6 +34,12 @@ namespace PollBot.Jobs
                     .InTimeZone(TimeZoneInfo.FindSystemTimeZoneById("Russian Standard Time")))
                 .Build();
             await scheduler.ScheduleJob(answerJob, answerTriger);
+
+            IJobDetail consoleJob = JobBuilder.Create<ConsoleHandleJob>().Build();
+            ITrigger consoleTriger = TriggerBuilder.Create()
+                .WithIdentity("trigger3", "group3").StartNow()
+                .Build();
+            await scheduler.ScheduleJob(consoleJob, consoleTriger);
         }
     }
 }

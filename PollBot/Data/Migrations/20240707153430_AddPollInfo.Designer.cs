@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PollBot.Data;
 
@@ -10,9 +11,10 @@ using PollBot.Data;
 namespace PollBot.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20240707153430_AddPollInfo")]
+    partial class AddPollInfo
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.0");
@@ -22,10 +24,6 @@ namespace PollBot.Data.Migrations
                     b.Property<long>("ChatId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("ChatTitle")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.Property<int?>("LastPollId")
                         .HasColumnType("INTEGER");

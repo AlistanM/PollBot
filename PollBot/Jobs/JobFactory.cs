@@ -1,16 +1,13 @@
-﻿using Quartz.Spi;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Quartz;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Quartz.Spi;
 
 namespace PollBot.Jobs
 {
     public class JobFactory : IJobFactory
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly Dictionary<IJob, IServiceScope> _jobScopeMapping = new();
 
         public JobFactory(IServiceProvider serviceProvider)
         {
@@ -19,12 +16,25 @@ namespace PollBot.Jobs
 
         public IJob NewJob(TriggerFiredBundle bundle, IScheduler scheduler)
         {
-            return _serviceProvider.GetService(bundle.JobDetail.JobType) as IJob;
+            var scope = _serviceProvider.CreateScope();
+            var job = scope.ServiceProvider.GetService(bundle.JobDetail.JobType) as IJob;
+            _jobScopeMapping.Add(job, scope);
+
+            return job;
         }
 
         public void ReturnJob(IJob job)
         {
-            Console.WriteLine("Fck");
+            if (!_jobScopeMapping.TryGetValue(job, out var scope))
+            {
+                Console.WriteLine("Mapping for job does not found!");
+                return;
+            }
+
+            _jobScopeMapping.Remove(job);
+            scope.Dispose();
+
+            Console.WriteLine("Job was complete");
         }
 
     }

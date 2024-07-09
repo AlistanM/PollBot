@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PollBot.Bot;
 using PollBot.Configuration;
 using PollBot.Data;
+using PollBot.Services;
 using Telegram.Bot;
 using Telegram.Bot.Polling;
 
@@ -17,6 +18,8 @@ namespace PollBot
 
             var provider = DI.ConfigureServices();
             await ApplyMigrations(provider);
+
+            provider.GetService<DictGeneratorService>().GenerateDictonary();
 
             var cts = new CancellationTokenSource();
             var cancellationToken = cts.Token;
